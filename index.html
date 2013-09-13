@@ -1,33 +1,42 @@
 <html data-ng-app="">
 <head>
 	<title>Dig</title>
-	
+
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>	
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular.min.js"></script>
 	<script type="text/javascript" src="index.js"></script>
+	
+	<link rel="stylesheet" href="style.css" />
 </head>
 <body data-ng-controller="game">
-	<h1>Dig</h1>
-	<br />
-	<br />
-	<button data-ng-click="dig()">DIG</button>
-	<br />
-	<h2>Main</h2>
-	Depth: {{depth}}
-	<br />
-	Funds: {{funds}}
-	<h2>Minions</h2>
-	<div data-ng-repeat="(key, item) in shop">
-		{{item.name}}: {{item.owned}}
-		<br /><span data-ng-repeat="count in ngArray(item.owned) track by $index">X</span>
+	<div class="wrapper">
+
 	</div>
-	<h2>Shop</h2>
-	<div data-ng-repeat="(key, item) in shop">
-		<button data-ng-click="purchaseShopItem(key)">{{item.name}} - {{currentCost(key) | number:0}}</button> {{item.desc}}
-		<br />{{item}}
+	<div class="horizon">
+		<div class="inner" style="height: {{depth}}px; width: {{holeWidth()}}px;">
+			<div class="miniondiv">This is a test</div>
+		</div>
 	</div>
-	<h2>Achievements</h2>
-	<div data-ng-repeat="achievement in achievements | filter: {nailed:true}">
-		<span>{{achievement.name}}: {{achievement.desc}}</span>
+		
+	<div class="interface">
+		<button data-ng-click="dig()"><h1>Dig</h1></button>
+		<h2>Main</h2>
+		Depth: {{depth}}
+		<br />
+		Funds: {{funds}}
+		<h2>Minions</h2>
+		<div data-ng-repeat="(key, item) in shop">
+			{{item.name}}: {{item.owned}}
+			<br /><span data-ng-repeat="count in ngArray(item.owned) track by $index">X</span>
+		</div>
+		<h2>Shop</h2>
+		<div data-ng-repeat="(key, item) in shop">
+			<button data-ng-click="purchaseShopItem(key)">{{item.name}} - {{currentCost(key) | number:0}}</button> {{item.desc}}
+		</div>
+		<h2>Achievements</h2>
+		<div data-ng-repeat="achievement in achievements | filter: {nailed:true}">
+			<span>{{achievement.name}}: {{achievement.desc}}</span>
+		</div>
 	</div>
 </body>
 </html>

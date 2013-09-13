@@ -1,7 +1,7 @@
 var base_pricemod = 1.2;
 var base_buyback = .6;
 
-function game($scope, $timeout) {
+function game($scope, $timeout, $document, $window) {
 	$scope.depth = 0;
 	$scope.funds = 1000;
 	$scope.digValue = 1;
@@ -122,6 +122,27 @@ function game($scope, $timeout) {
 	$scope.ngArray = function (number) {
 		return new Array(number);
 	};
+
+	
+	/* VIEW LOGIC! THIS MUST BE MOVED TO A DIRECTIVE FOR MODuLARITY! */
+	// Scroll page to bottom; this is ugly.
+	$scope.$watch("depth", function () {
+		angular.element($window).scrollTop($(document).height());
+	});
+	
+	$scope.holeWidth = function () {
+		var width = 0;
+		for (var prop in $scope.shop) {
+			if ($scope.shop.hasOwnProperty(prop)) {
+				width += $scope.shop[prop].owned * $scope.shop[prop].digValue; // Need to temper this with digValue.
+			}
+		}		
+		
+		if (width < 350) width = 350;
+		return (width > 700 ? 700 : width);
+	};
+	
+	/* END VIEW LOGIC! */
 	
 	// Main game logic here.
 	$timeout(function gameloop() {
