@@ -66,6 +66,16 @@ body {
 	/* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#bf382402', endColorstr='#bf382402',GradientType=1 ); /* IE6-9 */
 }
 
+[data-depth]:after {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	content: attr(data-depth) ' feet';
+	font-size: 40px;
+	border-bottom: 1px solid white;
+	color: white;
+}
+
 .inner .miniondiv {
 	position: absolute;
 	width: 700px;
@@ -73,3 +83,4 @@ body {
 	color: white;
 	text-align: center;
 }
+
