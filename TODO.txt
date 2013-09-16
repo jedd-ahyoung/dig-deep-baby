@@ -1,0 +1,5 @@
+-Formula for widening hole progressively based on minion count/strength
+-Better animation for bg scrolling
+-Add minions to page
+-Put template in script tag or separate file....
+-General style.

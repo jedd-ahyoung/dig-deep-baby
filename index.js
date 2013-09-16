@@ -8,7 +8,7 @@ app.directive('display', function ($window, $document) {
 	return {
 		scope: true,
 		restrict: 'A',
-		template: '<div class="wrapper"></div><div class="horizon"><div class="inner" style="height: {{depth}}px; width: {{holeWidth()}}px;"><div class="miniondiv">This is a test</div></div></div>',
+		template: '<div class="wrapper"></div><div class="horizon"><div class="inner" style="height: {{depth}}px; width: {{holeWidth()}}px;"><div data-ng-repeat="(key, item) in shop" class="miniondiv" style="width: {{holeWidth()}}px;"><span data-ng-repeat="count in ngArray(item.owned) track by $index">{{item.name}}</span></div></div></div>',
 		link: function (scope, element, attrs) {
 			// Scroll page to bottom; this is ugly.
 			scope.$watch("depth", function () {
