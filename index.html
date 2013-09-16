@@ -1,4 +1,4 @@
-<html data-ng-app="">
+<html data-ng-app="dig">
 <head>
 	<title>Dig</title>
 
@@ -9,15 +9,9 @@
 	<link rel="stylesheet" href="style.css" />
 </head>
 <body data-ng-controller="game">
-	<div class="wrapper">
+	<div data-display="">
 
 	</div>
-	<div class="horizon">
-		<div class="inner" style="height: {{depth}}px; width: {{holeWidth()}}px;">
-			<div class="miniondiv">This is a test</div>
-		</div>
-	</div>
-		
 	<div class="interface">
 		<button data-ng-click="dig()"><h1>Dig</h1></button>
 		<h2>Main</h2>
