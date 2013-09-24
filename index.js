@@ -3,17 +3,30 @@ var base_buyback = .6;
 
 var app = angular.module('dig', []);
 
-app.directive('display', function ($window, $document) {
+app.factory('animate', function($window, $rootScope) {
+	var requestAnimationFrame = $window.requestAnimationFrame ||
+								$window.mozRequestAnimationFrame ||
+								$window.msRequestAnimationFrame ||
+								$window.webkitRequestAnimationFrame;
+
+	return function(tick) {
+		requestAnimationFrame(function() {
+			$rootScope.$apply(tick);
+		});
+	};
+});
+
+app.directive('display', function ($window, $document, animate) {
 	/* This directive is solely for view logic. */
 	return {
 		scope: true,
 		restrict: 'A',
-		template: '<div class="wrapper"></div><div class="horizon"><div class="inner" data-depth="{{depth | number}}" style="height: {{depth}}px; width: {{holeWidth()}}px;"><div data-ng-repeat="(key, item) in shop" class="miniondiv" style="width: {{holeWidth()}}px;"><span data-ng-repeat="count in ngArray(item.owned) track by $index">{{item.name}}</span></div></div></div>',
+		template: '<div class="wrapper"></div><div class="horizon" style="background-position: 0px -{{depth}}px;"><div class="inner" data-depth="{{depth | number}}" style="height: {{depth}}px; width: {{holeWidth()}}px; background-position: 0px -{{depth}}px;"><div data-ng-repeat="(key, item) in shop" class="miniondiv" style="width: {{holeWidth()}}px;"><span data-ng-repeat="count in ngArray(item.owned) track by $index">{{item.name}}</span></div></div></div>',
 		link: function (scope, element, attrs) {
 			// Scroll page to bottom; this is ugly.
-			scope.$watch("depth", function () {
-				angular.element($window).scrollTop($document.height());
-			});
+			// scope.$watch("depth", function () {
+			// 	angular.element($window).scrollTop($document.height());
+			// });
 			
 			scope.holeWidth = function () {
 				var width = 0;
@@ -26,13 +39,20 @@ app.directive('display', function ($window, $document) {
 				if (width < 350) width = 350;
 				return (width > 700 ? 700 : width);
 			};
+			
+			console.log("animate", animate);
+			
+			(function tick() {
+				angular.element($window).scrollTop($document.height());
+				animate(tick);
+			})();
 		}
 	}
 });
 
 app.controller('game', function ($scope, $timeout, $document, $window) {
 	$scope.depth = 0;
-	$scope.funds = 100000;
+	$scope.funds = 10000000000;
 	$scope.digValue = 1;
 	
 	// Shop Items
@@ -176,7 +196,7 @@ app.controller('game', function ($scope, $timeout, $document, $window) {
 				}
 			}
 		}
-		
+
 		counter++;
 		$timeout(gameloop, 100);
 	}, 100);
