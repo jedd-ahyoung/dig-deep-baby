@@ -4,14 +4,19 @@ var base_buyback = .6;
 var app = angular.module('dig', []);
 
 app.factory('animate', function($window, $rootScope) {
-	var requestAnimationFrame = $window.requestAnimationFrame ||
-								$window.mozRequestAnimationFrame ||
-								$window.msRequestAnimationFrame ||
-								$window.webkitRequestAnimationFrame;
+	// So that polyfill really needs to end up in here.
+
+	var requestAnimationFrame = $window.requestAnimationFrame;
+								//||
+								//$window.mozRequestAnimationFrame ||
+								//$window.msRequestAnimationFrame ||
+								//$window.webkitRequestAnimationFrame;
 
 	return function(tick) {
-		requestAnimationFrame(function() {
-			$rootScope.$apply(tick);
+		requestAnimationFrame(function(timestamp) {
+			$rootScope.$apply(function () {
+				tick(timestamp);  // Nested madness!
+			});
 		});
 	};
 });
@@ -21,7 +26,7 @@ app.directive('display', function ($window, $document, animate) {
 	return {
 		scope: true,
 		restrict: 'A',
-		template: '<div class="wrapper"></div><div class="horizon" style="background-position: 0px -{{depth}}px;"><div class="inner" data-depth="{{depth | number}}" style="height: {{depth}}px; width: {{holeWidth()}}px; background-position: 0px -{{depth}}px;"><div data-ng-repeat="(key, item) in shop" class="miniondiv" style="width: {{holeWidth()}}px;"><span data-ng-repeat="count in ngArray(item.owned) track by $index">{{item.name}}</span></div></div></div>',
+		template: '<div class="wrapper"></div><div class="horizon" style="background-position: 0px -{{depth}}px;"><div class="inner" data-depth="{{depth | number}}" style="height: {{depth}}px; width: {{holeWidth()}}px; background-position: 0px -{{depth}}px;"><div data-ng-repeat="(key, item) in shop" class="miniondiv" style="width: {{holeWidth()}}px;"><span data-ng-repeat="count in ngArray(item.owned) track by $index"><img data-ng-src="img/{{item.name}}.png" /></span></div></div></div>',
 		link: function (scope, element, attrs) {
 			// Scroll page to bottom; this is ugly.
 			// scope.$watch("depth", function () {
@@ -50,7 +55,7 @@ app.directive('display', function ($window, $document, animate) {
 	}
 });
 
-app.controller('game', function ($scope, $timeout, $document, $window) {
+app.controller('game', function ($scope, $timeout, $document, animate) {
 	$scope.depth = 0;
 	$scope.funds = 10000000000;
 	$scope.digValue = 1;
@@ -62,7 +67,7 @@ app.controller('game', function ($scope, $timeout, $document, $window) {
 			desc: "The true badasses!",
 			cost: 30,
 			digValue: 1,
-			cycle: 10,
+			cycle: 1,
 			owned: 0
 		},
 		_2worker: {
@@ -70,7 +75,7 @@ app.controller('game', function ($scope, $timeout, $document, $window) {
 			desc: "Overworked, and underpaid.",
 			cost: 50,
 			digValue: 2,
-			cycle: 10,
+			cycle: 1,
 			owned: 0
 		},
 		_3excavator: {
@@ -78,7 +83,7 @@ app.controller('game', function ($scope, $timeout, $document, $window) {
 			desc: "Displacement is the key word!",
 			cost: 800,
 			digValue: 20,
-			cycle: 10,
+			cycle: 1,
 			owned: 0
 		},
 		_4drill: {
@@ -86,7 +91,7 @@ app.controller('game', function ($scope, $timeout, $document, $window) {
 			desc: "This ain't your daddy's hand drill.",
 			cost: 7000,
 			digValue: 8,
-			cycle: 1,
+			cycle: 10,
 			owned: 0
 		},
 		_5stoneburner: {
@@ -94,7 +99,7 @@ app.controller('game', function ($scope, $timeout, $document, $window) {
 			desc: "Banned weaponry.",
 			cost: 60000,
 			digValue: 600,
-			cycle: 50,
+			cycle: .2,
 			owned: 0
 		},
 		_6shaihulud: {
@@ -102,7 +107,7 @@ app.controller('game', function ($scope, $timeout, $document, $window) {
 			desc: "The great makers cometh.",
 			cost: 800000,
 			digValue: 2000,
-			cycle: 10,
+			cycle: 1,
 			owned: 0
 		},
 		_7bombard: {
@@ -110,7 +115,7 @@ app.controller('game', function ($scope, $timeout, $document, $window) {
 			desc: "Not even Will Smith can stop this one.",
 			cost: 2000000,
 			digValue: 50000,
-			cycle: 100,
+			cycle: .1,
 			owned: 0
 		}
 	};
@@ -136,16 +141,9 @@ app.controller('game', function ($scope, $timeout, $document, $window) {
 		var digValue = amt || $scope.digValue;
 		$scope.funds += digValue;
 		
-		if (digValue > 5) {
-			var depthToAdd = (digValue - (digValue % 5)) / 5;
-			$scope.depth += depthToAdd;
-		} else if (!($scope.funds % 5)) {
-			$scope.depth += digValue;
-		}
+		$scope.depth += digValue / 5;
 	};
 	
-	var counter = 0;
-
 	$scope.purchaseShopItem = function (key) {
 		if (!key) {
 			return;
@@ -172,15 +170,21 @@ app.controller('game', function ($scope, $timeout, $document, $window) {
 		return new Array(number);
 	};
 
+	var counter = 0;
+	var oldtime = Date.now();
+	
 	// Main game logic here.
-	$timeout(function gameloop() {
+	animate(function gameloop(timestamp) {
+	
+		var elapsed = timestamp - oldtime;
+		console.log("timestamp", timestamp);
+		oldtime = timestamp;
+	
 		// TODO: inject underscore.
 		for (var prop in $scope.shop) {
 			if ($scope.shop.hasOwnProperty(prop)) {
-				if (!(counter % $scope.shop[prop].cycle)) {
-					for (var i = 0; i < $scope.shop[prop].owned; i++) {
-						$scope.dig($scope.shop[prop].digValue);
-					}
+				for (var i = 0; i < $scope.shop[prop].owned; i++) {
+					$scope.dig($scope.shop[prop].digValue * elapsed * $scope.shop[prop].cycle / 1000);
 				}
 			}
 		}
@@ -198,6 +202,6 @@ app.controller('game', function ($scope, $timeout, $document, $window) {
 		}
 
 		counter++;
-		$timeout(gameloop, 100);
-	}, 100);
+		animate(gameloop);
+	});
 });
