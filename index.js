@@ -45,8 +45,6 @@ app.directive('display', function ($window, $document, animate) {
 				return (width > 700 ? 700 : width);
 			};
 			
-			console.log("animate", animate);
-			
 			(function tick() {
 				angular.element($window).scrollTop($document.height());
 				animate(tick);
@@ -120,6 +118,20 @@ app.controller('game', function ($scope, $timeout, $document, animate) {
 		}
 	};
 	
+	// Upgrade items
+	$scope.upgrades = {
+		_1test: {
+			name: "Test upgrade",
+			desc: "This upgrade is awesome!",
+			type: "digger",
+			cost: 50000,
+			effect: "funds = 0",
+			unlocks: "depth > 800",
+			available: false,
+			enabled: false
+		}
+	};
+	
 	$scope.achievements = [
 		{
 			name: "Breaking Ground",
@@ -166,6 +178,23 @@ app.controller('game', function ($scope, $timeout, $document, animate) {
 		}
 	};
 	
+	$scope.purchaseUpgradeItem = function (key) {
+		if (!key) {
+			return;
+		}
+		
+		if ($scope.funds >= $scope.upgrades[key].cost) {
+			$scope.$eval($scope.upgrades[key].effect);
+		
+			$scope.funds -= $scope.upgrades[key].cost;
+			$scope.upgrades[key].enabled = true;
+		}
+	};
+	
+	$scope.showUpgradeItem = function (expression) {
+		return $scope.$eval(expression);
+	};
+	
 	$scope.ngArray = function (number) {
 		return new Array(number);
 	};
@@ -177,7 +206,6 @@ app.controller('game', function ($scope, $timeout, $document, animate) {
 	animate(function gameloop(timestamp) {
 	
 		var elapsed = timestamp - oldtime;
-		console.log("timestamp", timestamp);
 		oldtime = timestamp;
 	
 		// TODO: inject underscore.
@@ -185,6 +213,15 @@ app.controller('game', function ($scope, $timeout, $document, animate) {
 			if ($scope.shop.hasOwnProperty(prop)) {
 				for (var i = 0; i < $scope.shop[prop].owned; i++) {
 					$scope.dig($scope.shop[prop].digValue * elapsed * $scope.shop[prop].cycle / 1000);
+				}
+			}
+		}
+		
+		// Watch the upgrades. Again, MIGHT be better through scope.watch
+		for (var prop in $scope.upgrades) {
+			if ($scope.upgrades.hasOwnProperty(prop)) {
+				if (!($scope.upgrades[prop].available) && $scope.$eval($scope.upgrades[prop].unlocks)) {
+					$scope.upgrades[prop].available = true;
 				}
 			}
 		}

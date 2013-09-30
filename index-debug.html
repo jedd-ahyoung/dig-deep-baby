@@ -26,6 +26,11 @@
 		<button data-ng-click="purchaseShopItem(key)">{{item.name}} - {{currentCost(key) | number:0}}</button> {{item.desc}}
 		<br />{{item}}
 	</div>
+	<h2>Upgrades</h2>
+	<div class="shopitem" data-ng-repeat="(key, item) in upgrades" data-ng-show="item.available && !(item.enabled)" data-ng-click="purchaseUpgradeItem(key)">
+		<span><strong>{{item.name}}</strong> <em>${{item.cost | number:0}}</em></span>
+		<br /> {{item.desc}}
+	</div>
 	<h2>Achievements</h2>
 	<div data-ng-repeat="achievement in achievements | filter: {nailed:true}">
 		<span>{{achievement.name}}: {{achievement.desc}}</span>
