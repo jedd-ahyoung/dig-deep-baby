@@ -1,7 +1,7 @@
 var base_pricemod = 1.2;
 var base_buyback = .6;
 
-var app = angular.module('dig', []);
+var app = angular.module('dig', ['ngAnimate']);
 
 app.factory('animate', function($window, $rootScope) {
 	// So that polyfill really needs to end up in here.
@@ -26,7 +26,7 @@ app.directive('display', function ($window, $document, animate) {
 	return {
 		scope: true,
 		restrict: 'A',
-		template: '<div class="wrapper"></div><div class="horizon" style="background-position: 0px -{{depth}}px;"><div class="inner" data-depth="{{depth | number}}" style="height: {{depth}}px; width: {{holeWidth()}}px; background-position: 0px -{{depth}}px;"><div data-ng-repeat="(key, item) in shop" class="miniondiv" style="width: {{holeWidth()}}px;"><span data-ng-repeat="count in ngArray(item.owned) track by $index"><img data-ng-src="img/{{item.name}}.png" /></span></div></div></div>',
+		template: '<div class="wrapper"></div><div class="horizon" style="background-position: 0px -{{depth}}px;"><div class="inner" data-depth="{{depth | number:0}}" style="height: {{depth}}px; width: {{holeWidth()}}px; background-position: 0px -{{depth}}px;"><div data-ng-repeat="(key, item) in shop" class="miniondiv" style="width: {{holeWidth()}}px;"><span data-ng-repeat="count in ngArray(item.owned) track by $index"><img data-ng-src="img/{{item.name}}.png" /></span></div></div></div>',
 		link: function (scope, element, attrs) {
 			// Scroll page to bottom; this is ugly.
 			// scope.$watch("depth", function () {
@@ -53,97 +53,36 @@ app.directive('display', function ($window, $document, animate) {
 	}
 });
 
-app.controller('game', function ($scope, $timeout, $document, animate) {
+app.service('configuration', function ($http) {
+	return {
+		load: function (url, local) {
+			if (local) {
+				return $http.get(url);
+			} else {
+				return $http.get(url);	
+			}
+		}
+	}
+});
+
+app.controller('game', function ($scope, $timeout, $document, configuration, animate) {
 	$scope.depth = 0;
 	$scope.funds = 10000000000;
 	$scope.digValue = 1;
 	
-	// Shop Items
-	$scope.shop = {
-		_1gopher: {
-			name: "Gopher",
-			desc: "The true badasses!",
-			cost: 30,
-			digValue: 1,
-			cycle: 1,
-			owned: 0
-		},
-		_2worker: {
-			name: "Digger",
-			desc: "Overworked, and underpaid.",
-			cost: 50,
-			digValue: 2,
-			cycle: 1,
-			owned: 0
-		},
-		_3excavator: {
-			name: "Excavator",
-			desc: "Displacement is the key word!",
-			cost: 800,
-			digValue: 20,
-			cycle: 1,
-			owned: 0
-		},
-		_4drill: {
-			name: "Giant Drill",
-			desc: "This ain't your daddy's hand drill.",
-			cost: 7000,
-			digValue: 8,
-			cycle: 10,
-			owned: 0
-		},
-		_5stoneburner: {
-			name: "Stone Burners",
-			desc: "Banned weaponry.",
-			cost: 60000,
-			digValue: 600,
-			cycle: .2,
-			owned: 0
-		},
-		_6shaihulud: {
-			name: "Sandworms",
-			desc: "The great makers cometh.",
-			cost: 800000,
-			digValue: 2000,
-			cycle: 1,
-			owned: 0
-		},
-		_7bombard: {
-			name: "Orbital Bombardment",
-			desc: "Not even Will Smith can stop this one.",
-			cost: 2000000,
-			digValue: 50000,
-			cycle: .1,
-			owned: 0
-		}
-	};
+	$scope.shop = {};
+	$scope.upgrades = {};
+	$scope.achievements = [];
 	
-	// Upgrade items
-	$scope.upgrades = {
-		_1test: {
-			name: "Test upgrade",
-			desc: "This upgrade is awesome!",
-			type: "digger",
-			cost: 50000,
-			effect: "funds = 0",
-			unlocks: "depth > 800",
-			available: false,
-			enabled: false
-		}
-	};
-	
-	$scope.achievements = [
-		{
-			name: "Breaking Ground",
-			criteria: "depth > 0",
-			desc: "Begin digging!"
-		},
-		{
-			name: "Six Feet Under",
-			criteria: "depth >= 6",
-			desc: "Reach a depth of six feet."
-		}
-	];
+	configuration.load("configuration.json", true)
+		.success(function (result) {
+			$scope.shop = result.shop;
+			$scope.upgrades = result.upgrades;
+			$scope.achievements = result.achievements;
+		})
+		.error(function () {
+			console.log("ERROR");
+		});
 	
 	$scope.currentCost = function (key) {
 		return Math.round($scope.shop[key].cost * Math.pow(base_pricemod, $scope.shop[key].owned));
