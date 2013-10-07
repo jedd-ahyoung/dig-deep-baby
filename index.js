@@ -7,10 +7,6 @@ app.factory('animate', function($window, $rootScope) {
 	// So that polyfill really needs to end up in here.
 
 	var requestAnimationFrame = $window.requestAnimationFrame;
-								//||
-								//$window.mozRequestAnimationFrame ||
-								//$window.msRequestAnimationFrame ||
-								//$window.webkitRequestAnimationFrame;
 
 	return function(tick) {
 		requestAnimationFrame(function(timestamp) {
@@ -26,13 +22,18 @@ app.directive('display', function ($window, $document, animate) {
 	return {
 		scope: true,
 		restrict: 'A',
-		template: '<div class="wrapper"></div><div class="horizon" style="background-position: 0px -{{depth}}px;"><div class="inner" data-depth="{{depth | number:0}}" style="height: {{depth}}px; width: {{holeWidth()}}px; background-position: 0px -{{depth}}px;"><div data-ng-repeat="(key, item) in shop" class="miniondiv" style="width: {{holeWidth()}}px;"><span data-ng-repeat="count in ngArray(item.owned) track by $index"><img data-ng-src="img/{{item.name}}.png" /></span></div></div></div>',
+		template: '<div class="wrapper"></div><div class="horizon" style="background-position: 0px -{{bgPos(depth)}}px;"><div class="inner" data-depth="{{depth | number:0}}" style="height: {{holeHeight(depth)}}; width: {{holeWidth()}}px; background-position: 0px -{{bgPos(depth)}}px;"><div data-ng-repeat="(key, item) in shop" class="miniondiv" style="width: {{holeWidth()}}px;"><span data-ng-repeat="count in ngArray(item.owned) track by $index"><img data-ng-src="img/{{item.name}}.png" /></span></div></div></div>',
 		link: function (scope, element, attrs) {
-			// Scroll page to bottom; this is ugly.
-			// scope.$watch("depth", function () {
-			// 	angular.element($window).scrollTop($document.height());
-			// });
+			var windowheight = angular.element($window).height();
 			
+			scope.holeHeight = function (depth) {
+				return (depth * .2) < windowheight ? Math.floor(depth * .2) + 'px' : "100%";
+			};
+			
+			scope.bgPos = function (depth) {
+				return (depth * .2) < windowheight ? 0 : Math.floor((depth - windowheight) * .2);
+			};
+		
 			scope.holeWidth = function () {
 				var width = 0;
 				for (var prop in scope.shop) {
