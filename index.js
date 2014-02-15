@@ -1,10 +1,39 @@
 var base_pricemod = 1.2;
 var base_buyback = .6;
 
-var app = angular.module('dig', ['ngAnimate']);
+angular.module('underscore', [])
+	.factory('_', function() {
+		return window._; // assumes underscore has already been loaded on the page
+	});
+
+var app = angular.module('dig', ['ngAnimate', 'underscore']);
 
 app.factory('animate', function($window, $rootScope) {
 	// So that polyfill really needs to end up in here.
+	
+	if (!Date.now)
+    Date.now = function() { return new Date().getTime(); };
+
+	(function() {
+		var vendors = ['webkit', 'moz'];
+		for (var i = 0; i < vendors.length && !window.requestAnimationFrame; ++i) {
+			var vp = vendors[i];
+			window.requestAnimationFrame = window[vp+'RequestAnimationFrame'];
+			window.cancelAnimationFrame = (window[vp+'CancelAnimationFrame']
+									   || window[vp+'CancelRequestAnimationFrame']);
+		}
+		if (/iP(ad|hone|od).*OS 6/.test(window.navigator.userAgent) // iOS6 is buggy
+			|| !window.requestAnimationFrame || !window.cancelAnimationFrame) {
+			var lastTime = 0;
+			window.requestAnimationFrame = function(callback) {
+				var now = Date.now();
+				var nextTime = Math.max(lastTime + 16, now);
+				return setTimeout(function() { callback(lastTime = nextTime); },
+								  nextTime - now);
+			};
+			window.cancelAnimationFrame = clearTimeout;
+		}
+	}());
 
 	var requestAnimationFrame = $window.requestAnimationFrame;
 
@@ -22,16 +51,16 @@ app.directive('display', function ($window, $document, animate) {
 	return {
 		scope: true,
 		restrict: 'A',
-		template: '<div class="wrapper"></div><div class="horizon" style="background-position: 0px -{{bgPos(depth)}}px;"><div class="inner" data-depth="{{depth | number:0}}" style="height: {{holeHeight(depth)}}; width: {{holeWidth()}}px; background-position: 0px -{{bgPos(depth)}}px;"><div data-ng-repeat="(key, item) in shop" class="miniondiv" style="width: {{holeWidth()}}px;"><span data-ng-repeat="count in ngArray(item.owned) track by $index"><img data-ng-src="img/{{item.name}}.png" /></span></div></div></div>',
+		template: '<div class="wrapper"></div><div class="horizon" style="background-position: 0px -{{bgPos(depth)}}px;"><div class="inner" data-depth="{{depth | number:0}}" style="height: {{holeHeight(depth) || \'100%\'}}; width: {{holeWidth()}}px; background-position: 0px -{{bgPos(depth)}}px;"><div data-ng-repeat="item in displayArray | orderBy:\'$index\':true" class="miniondiv" style="width: {{holeWidth()}}px;"><span data-ng-repeat="count in ngArray(item.owned) track by $index"><img data-ng-src="img/{{item.name}}.png" /></span></div></div></div>',
 		link: function (scope, element, attrs) {
 			var windowheight = angular.element($window).height();
 			
 			scope.holeHeight = function (depth) {
-				return (depth * .2) < windowheight ? Math.floor(depth * .2) + 'px' : "100%";
+				return (depth * .2) < windowheight ? (depth * .2) + 'px' : undefined;
 			};
 			
 			scope.bgPos = function (depth) {
-				return (depth * .2) < windowheight ? 0 : Math.floor((depth - windowheight) * .2);
+				return (depth * .2) < windowheight ? 0 : (depth - windowheight) * .2;
 			};
 		
 			scope.holeWidth = function () {
@@ -45,6 +74,15 @@ app.directive('display', function ($window, $document, animate) {
 				if (width < 350) width = 350;
 				return (width > 700 ? 700 : width);
 			};
+			
+			scope.displayArray = [];
+
+			scope.$watch('shop', function () {
+				// This is fucking stupid, need to put ID properties on the shop stuff and make them arrays.
+				scope.displayArray = _.values(scope.shop);
+				scope.displayArray = scope.displayArray.reverse();
+				console.log(scope.displayArray);
+			});
 			
 			(function tick() {
 				angular.element($window).scrollTop($document.height());
