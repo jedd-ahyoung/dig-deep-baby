@@ -64,27 +64,22 @@ app.directive('display', function ($window, $document, animate) {
 			};
 		
 			scope.holeWidth = function () {
-				var width = 0;
-				for (var prop in scope.shop) {
-					if (scope.shop.hasOwnProperty(prop)) {
-						width += scope.shop[prop].owned * scope.shop[prop].digValue; // Need to temper this with digValue.
-					}
-				}		
-				
-				if (width < 350) width = 350;
-				return (width > 700 ? 700 : width);
+				return Math.min(700, Math.max(350, _(scope.shop)
+					.reduce(function (p, c) {
+						return p + c.owned * c.digValue;
+					}, 0)
+				));
 			};
 			
 			scope.displayArray = [];
 
 			scope.$watch('shop', function () {
 				// This is fucking stupid, need to put ID properties on the shop stuff and make them arrays.
-				scope.displayArray = _.values(scope.shop);
-				scope.displayArray = scope.displayArray.reverse();
+				scope.displayArray = _.values(scope.shop).reverse();
 				console.log(scope.displayArray);
 			});
 			
-			(function tick() {
+			(function tick(timestamp) {
 				angular.element($window).scrollTop($document.height());
 				animate(tick);
 			})();
@@ -95,18 +90,14 @@ app.directive('display', function ($window, $document, animate) {
 app.service('configuration', function ($http) {
 	return {
 		load: function (url, local) {
-			if (local) {
-				return $http.get(url);
-			} else {
-				return $http.get(url);	
-			}
+			return local ? $http.get(url) : $http.get(url);
 		}
 	}
 });
 
 app.controller('game', function ($scope, $timeout, $document, configuration, animate) {
 	$scope.depth = 0;
-	$scope.funds = 10000000000;
+	$scope.funds = 100000000000;
 	$scope.digValue = 1;
 	
 	$scope.shop = {};
@@ -130,14 +121,11 @@ app.controller('game', function ($scope, $timeout, $document, configuration, ani
 	$scope.dig = function (amt) {
 		var digValue = amt || $scope.digValue;
 		$scope.funds += digValue;
-		
 		$scope.depth += digValue / 5;
 	};
 	
 	$scope.purchaseShopItem = function (key) {
-		if (!key) {
-			return;
-		}
+		if (!key) return;
 		
 		if ($scope.funds >= $scope.currentCost(key)) {
 			$scope.funds -= $scope.currentCost(key);
@@ -146,9 +134,7 @@ app.controller('game', function ($scope, $timeout, $document, configuration, ani
 	};
 	
 	$scope.sellShopItem = function (key) {
-		if (!key) {
-			return;
-		}
+		if (!key) return;
 		
 		if ($scope.owned > 0) {
 			$scope.funds += Math.round($scope.currentCost(key) * base_buyback);
@@ -157,9 +143,7 @@ app.controller('game', function ($scope, $timeout, $document, configuration, ani
 	};
 	
 	$scope.purchaseUpgradeItem = function (key) {
-		if (!key) {
-			return;
-		}
+		if (!key) return;
 		
 		if ($scope.funds >= $scope.upgrades[key].cost) {
 			$scope.$eval($scope.upgrades[key].effect);
@@ -182,39 +166,28 @@ app.controller('game', function ($scope, $timeout, $document, configuration, ani
 	
 	// Main game logic here.
 	animate(function gameloop(timestamp) {
-	
 		var elapsed = timestamp - oldtime;
 		oldtime = timestamp;
 	
-		// TODO: inject underscore.
-		for (var prop in $scope.shop) {
-			if ($scope.shop.hasOwnProperty(prop)) {
-				for (var i = 0; i < $scope.shop[prop].owned; i++) {
-					$scope.dig($scope.shop[prop].digValue * elapsed * $scope.shop[prop].cycle / 1000);
-				}
-			}
-		}
+		_($scope.shop)
+			.filter(function (val) { return val.owned; })
+			.each(function (val) {
+				$scope.dig(val.owned * val.digValue * elapsed * val.cycle / 1000);
+			});
 		
 		// Watch the upgrades. Again, MIGHT be better through scope.watch
-		for (var prop in $scope.upgrades) {
-			if ($scope.upgrades.hasOwnProperty(prop)) {
-				if (!($scope.upgrades[prop].available) && $scope.$eval($scope.upgrades[prop].unlocks)) {
-					$scope.upgrades[prop].available = true;
-				}
-			}
-		}
+		_($scope.upgrades)
+			.filter(function (val) { return !val.available; })
+			.each(function (val) {
+				val.available = $scope.$eval(val.unlocks) ? true : false;
+			});
 		
 		// Check achievements. There is probably a better way to do this via multiple $scope.watches.
-		for (var prop in $scope.achievements) {
-			if ($scope.achievements.hasOwnProperty(prop)) {
-				if (!($scope.achievements[prop].nailed)) {
-					if ($scope.$eval($scope.achievements[prop].criteria)) {
-						$scope.achievements[prop].nailed = true;
-						console.log("Nailed it!");
-					}
-				}
-			}
-		}
+		_($scope.achievements)
+			.filter(function (val) { return !val.nailed })
+			.each(function (val) {
+				val.nailed = $scope.$eval(val.criteria) ? true : false;
+			});
 
 		counter++;
 		animate(gameloop);
