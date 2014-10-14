@@ -1,0 +1,21 @@
+{
+  "name": "Blade or Die",
+  "version": "0.0.0",
+  "authors": [
+    "Jedd Ahyoung <jedd.ahyoung@gmail.com>"
+  ],
+  "description": "A google doodle duplicate.",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1"
+  }
+}

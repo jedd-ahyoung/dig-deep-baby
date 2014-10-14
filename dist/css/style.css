@@ -1,0 +1,152 @@
+* {
+  box-sizing: border-box;
+}
+html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+body {
+  background: #5ef url("../img/bg_sky.png") no-repeat center center;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+.shopinterface {
+  background: #fff;
+  background: rgba(255,255,255,0.4);
+  padding: 0px;
+  width: 500px;
+  margin: 0 auto;
+  padding: 10px;
+}
+.shopitem {
+  padding: 5px;
+  position: relative;
+  color: rgba(0,0,0,0.3);
+  transition: all 500ms ease-in-out;
+}
+.shopitem .itemcount {
+  color: #fff;
+  font-family: "Ceviche One", cursive;
+  font-size: 40px;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+.enabled {
+  color: #000;
+}
+.enabled:hover {
+  background: #fff;
+  background: rgba(255,255,255,0.7);
+}
+.enabled:active {
+  background: #fff;
+}
+.wrapper {
+  background: url("../img/grass.svg") repeat-x bottom;
+  background-size: 50px;
+  margin: 0;
+  position: relative;
+  height: 100%;
+}
+.horizon {
+  background: #8c5c0e url("../img/brown049.jpg");
+  transition: height 1000ms ease-out;
+}
+.inner {
+  max-width: 700px;
+  max-height: 100%;
+  margin: 0 auto;
+  background: #382402 url("../img/dgrey056.jpg");
+  position: relative;
+}
+.inner:before {
+  content: " ";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: linear-gradient(to right, rgba(35,29,18,0.9) 0%, rgba(35,29,18,0.15) 15%, rgba(35,29,18,0) 50%, rgba(35,29,18,0.15) 85%, rgba(35,29,18,0.9) 100%); /* W3C */
+/* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e6231d12', endColorstr='#e6231d12',GradientType=1 ); /* IE6-9 */
+}
+.inner .miniondiv {
+  position: absolute;
+  width: 700px;
+  bottom: 0;
+  color: #fff;
+  text-align: center;
+}
+[data-amt]:after {
+  position: absolute;
+  bottom: -12px;
+  right: 5px;
+  content: attr(data-amt);
+  font-family: "Ceviche One", cursive;
+  font-size: 80px;
+  color: #fff;
+}
+[data-depth]:after {
+  position: fixed;
+  bottom: 5px;
+  right: 5px;
+  width: 50%;
+  text-align: right;
+  content: attr(data-depth) ' feet';
+  font-family: "Ceviche One", cursive;
+  font-size: 40px;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  border-bottom: 1px solid #fff;
+  color: #fff;
+}
+.digbutton {
+  float: right;
+}
+.achievement {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+}
+.achievement .alert {
+  margin: 5px auto;
+  padding: 5px;
+  max-width: 40%;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 12px;
+  display: none;
+  background: linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 15%, #000 50%, rgba(0,0,0,0.85) 85%, rgba(0,0,0,0.5) 100%); /* W3C */
+  box-shadow: 0px 1px 1px 0px rgba(255,255,255,0.7);
+}
+.achievement .alert.ng-enter {
+  transition: all 3s ease-in;
+  opacity: 1;
+  display: block;
+}
+.achievement .alert.ng-enter.ng-enter-active {
+  opacity: 0;
+}
+.achievement .alert .title {
+  font-family: "Ceviche One", cursive;
+  font-size: 24px;
+}
+/* Utility */
+.hidden {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
