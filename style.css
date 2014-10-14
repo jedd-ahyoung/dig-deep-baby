@@ -1,3 +1,7 @@
+* {
+	box-sizing: border-box;
+}
+
 html {
 	margin: 0;
 	padding: 0;
@@ -31,14 +35,20 @@ body {
 .shopitem {
 	padding: 5px;
 	position: relative;
+	color: rgba(0,0,0,0.3);
+	transition: all 500ms ease-in-out;
 }
 
-.shopitem:hover {
+.enabled {
+	color: black;
+}
+
+.enabled:hover {
 	background: white;
 	background: rgba(255,255,255,.7);
 }
 
-.shopitem:active {
+.enabled:active {
 	background: white;
 }
 

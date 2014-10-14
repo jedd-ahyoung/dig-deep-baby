@@ -1,5 +1,5 @@
 var base_pricemod = 1.2;
-var base_buyback = .6;
+var base_buyback = 0.6;
 
 angular.module('underscore', [])
 	.factory('_', function() {
@@ -97,7 +97,7 @@ app.service('configuration', function ($http) {
 
 app.controller('game', function ($scope, $timeout, $document, configuration, animate) {
 	$scope.depth = 0;
-	$scope.funds = 100000000000;
+	$scope.funds = 00000000000;
 	$scope.digValue = 1;
 
 	$scope.shop = {};
@@ -169,11 +169,15 @@ app.controller('game', function ($scope, $timeout, $document, configuration, ani
 		var elapsed = timestamp - oldtime;
 		oldtime = timestamp;
 
-		_($scope.shop)
+		var digAmt = _($scope.shop)
 			.filter(function (val) { return val.owned; })
-			.each(function (val) {
-				$scope.dig(val.owned * val.digValue * elapsed * val.cycle / 1000);
-			});
+			.reduce(function (previous, val) {
+				return previous + (val.owned * val.digValue * elapsed * val.cycle);
+			}, 0);
+
+		if (digAmt) {
+			$scope.dig(digAmt / 1000);
+		}
 
 		// Watch the upgrades. Again, MIGHT be better through scope.watch
 		_($scope.upgrades)

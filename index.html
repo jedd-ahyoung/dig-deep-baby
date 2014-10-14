@@ -15,9 +15,9 @@
 	<div data-display=""></div>
 	<div class="overlay">
 		<button class="digbutton" data-ng-click="dig()"><h1>Dig</h1></button>
-			<div class="shopinterface">
+		<div class="shopinterface">
 			<h2>Shop - ${{funds | number:0}}</h2>
-			<div class="shopitem" data-ng-repeat="(key, item) in shop" data-ng-click="purchaseShopItem(key)">
+			<div class="shopitem" data-ng-class="{enabled: currentCost(key) < funds}" data-ng-repeat="(key, item) in shop" data-ng-click="purchaseShopItem(key)">
 				<span class="hidden">{{item.owned}}</span>
 				<span data-amt="{{item.owned}}"><strong>{{item.name}}</strong> <em>${{currentCost(key) | number:0}}</em></span>
 				<br /> {{item.desc}}
