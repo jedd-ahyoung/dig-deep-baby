@@ -10,7 +10,7 @@ var app = angular.module('dig', ['ngAnimate', 'underscore']);
 
 app.factory('animate', function($window, $rootScope) {
 	// So that polyfill really needs to end up in here.
-	
+
 	if (!Date.now)
     Date.now = function() { return new Date().getTime(); };
 
@@ -54,15 +54,15 @@ app.directive('display', function ($window, $document, animate) {
 		template: '<div class="wrapper"></div><div class="horizon" style="background-position: 0px -{{bgPos(depth)}}px;"><div class="inner" data-depth="{{depth | number:0}}" style="height: {{holeHeight(depth) || \'100%\'}}; width: {{holeWidth()}}px; background-position: 0px -{{bgPos(depth)}}px;"><div data-ng-repeat="item in displayArray | orderBy:\'$index\':true" class="miniondiv" style="width: {{holeWidth()}}px;"><span data-ng-repeat="count in ngArray(item.owned) track by $index"><img data-ng-src="img/{{item.name}}.png" /></span></div></div></div>',
 		link: function (scope, element, attrs) {
 			var windowheight = angular.element($window).height();
-			
+
 			scope.holeHeight = function (depth) {
 				return (depth * .2) < windowheight ? (depth * .2) + 'px' : undefined;
 			};
-			
+
 			scope.bgPos = function (depth) {
 				return (depth * .2) < windowheight ? 0 : (depth - windowheight) * .2;
 			};
-		
+
 			scope.holeWidth = function () {
 				return Math.min(700, Math.max(350, _(scope.shop)
 					.reduce(function (p, c) {
@@ -70,7 +70,7 @@ app.directive('display', function ($window, $document, animate) {
 					}, 0)
 				));
 			};
-			
+
 			scope.displayArray = [];
 
 			scope.$watch('shop', function () {
@@ -78,7 +78,7 @@ app.directive('display', function ($window, $document, animate) {
 				scope.displayArray = _.values(scope.shop).reverse();
 				console.log(scope.displayArray);
 			});
-			
+
 			(function tick(timestamp) {
 				angular.element($window).scrollTop($document.height());
 				animate(tick);
@@ -99,11 +99,11 @@ app.controller('game', function ($scope, $timeout, $document, configuration, ani
 	$scope.depth = 0;
 	$scope.funds = 100000000000;
 	$scope.digValue = 1;
-	
+
 	$scope.shop = {};
 	$scope.upgrades = {};
 	$scope.achievements = [];
-	
+
 	configuration.load("configuration.json", true)
 		.success(function (result) {
 			$scope.shop = result.shop;
@@ -113,17 +113,17 @@ app.controller('game', function ($scope, $timeout, $document, configuration, ani
 		.error(function () {
 			console.log("ERROR");
 		});
-	
+
 	$scope.currentCost = function (key) {
 		return Math.round($scope.shop[key].cost * Math.pow(base_pricemod, $scope.shop[key].owned));
 	};
-	
+
 	$scope.dig = function (amt) {
 		var digValue = amt || $scope.digValue;
 		$scope.funds += digValue;
 		$scope.depth += digValue / 5;
 	};
-	
+
 	$scope.purchaseShopItem = function (key) {
 		if (!key) return;
 		
@@ -132,56 +132,56 @@ app.controller('game', function ($scope, $timeout, $document, configuration, ani
 			$scope.shop[key].owned += 1;
 		}
 	};
-	
+
 	$scope.sellShopItem = function (key) {
 		if (!key) return;
-		
+
 		if ($scope.owned > 0) {
 			$scope.funds += Math.round($scope.currentCost(key) * base_buyback);
 			$scope.shop[key].owned -= 1;
 		}
 	};
-	
+
 	$scope.purchaseUpgradeItem = function (key) {
 		if (!key) return;
-		
+
 		if ($scope.funds >= $scope.upgrades[key].cost) {
 			$scope.$eval($scope.upgrades[key].effect);
-		
+
 			$scope.funds -= $scope.upgrades[key].cost;
 			$scope.upgrades[key].enabled = true;
 		}
 	};
-	
+
 	$scope.showUpgradeItem = function (expression) {
 		return $scope.$eval(expression);
 	};
-	
+
 	$scope.ngArray = function (number) {
 		return new Array(number);
 	};
 
 	var counter = 0;
 	var oldtime = Date.now();
-	
+
 	// Main game logic here.
 	animate(function gameloop(timestamp) {
 		var elapsed = timestamp - oldtime;
 		oldtime = timestamp;
-	
+
 		_($scope.shop)
 			.filter(function (val) { return val.owned; })
 			.each(function (val) {
 				$scope.dig(val.owned * val.digValue * elapsed * val.cycle / 1000);
 			});
-		
+
 		// Watch the upgrades. Again, MIGHT be better through scope.watch
 		_($scope.upgrades)
 			.filter(function (val) { return !val.available; })
 			.each(function (val) {
 				val.available = $scope.$eval(val.unlocks) ? true : false;
 			});
-		
+
 		// Check achievements. There is probably a better way to do this via multiple $scope.watches.
 		_($scope.achievements)
 			.filter(function (val) { return !val.nailed })
