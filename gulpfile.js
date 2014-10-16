@@ -11,7 +11,10 @@ var browserSync = require('browser-sync');
 var paths = {
 	js: 'app/js/*.js',
 	css: 'app/css/*.styl',
-	lib: 'app/lib/jquery/dist/jquery.min.js',
+	lib: [
+		'app/lib/jquery/dist/jquery.min.js',
+		'app/lib/angular-local-storage/dist/angular-local-storage.min.js',
+	],
 	img: 'app/img/*',
 	index: '*.html',
 	dist: 'dist'
