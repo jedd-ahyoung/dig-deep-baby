@@ -6,7 +6,7 @@ angular.module('underscore', [])
 		return window._; // assumes underscore has already been loaded on the page
 	});
 
-angular.module('dig', ['ngAnimate', 'underscore'])
+angular.module('dig', ['ngAnimate', 'underscore', 'LocalStorageModule'])
 	.factory('animate', ['$window', '$rootScope', function($window, $rootScope) {
 		// So that polyfill really needs to end up in here.
 
@@ -104,7 +104,18 @@ angular.module('dig', ['ngAnimate', 'underscore'])
 		};
 	}])
 
-	.controller('game', ['$scope', '$timeout', '$document', 'configuration', 'animate', function ($scope, $timeout, $document, configuration, animate) {
+	.service('gamestate', ['localStorageService', function (localStorageService) {
+		return {
+			load: function () {
+				return localStorageService.get('saveData');
+			},
+			save: function (state) {
+				return localStorageService.set('saveData', state);
+			}
+		};
+	}])
+
+	.controller('game', ['$scope', '$timeout', '$document', 'configuration', 'animate', 'gamestate', function ($scope, $timeout, $document, configuration, animate, gamestate) {
 		$scope.depth = 0;
 		$scope.funds = 0;
 		$scope.digValue = 1;
@@ -118,6 +129,14 @@ angular.module('dig', ['ngAnimate', 'underscore'])
 				$scope.shop = result.shop;
 				$scope.upgrades = result.upgrades;
 				$scope.achievements = result.achievements;
+
+				var saveData = gamestate.load();
+				if (saveData) {
+					$scope.depth = saveData.depth;
+					$scope.funds = saveData.funds;
+					$scope.shop = _.merge($scope.shop, saveData.shop);
+					$scope.upgrades = _.merge($scope.upgrades, saveData.upgrades);
+				}
 			})
 			.error(function () {
 				console.log("ERROR");
@@ -145,7 +164,7 @@ angular.module('dig', ['ngAnimate', 'underscore'])
 		$scope.sellShopItem = function (key) {
 			if (!key) return;
 
-			if ($scope.owned > 0) {
+			if ($scope.shop[key].owned > 0) {
 				$scope.funds += Math.round($scope.currentCost(key) * base_buyback);
 				$scope.shop[key].owned -= 1;
 			}
@@ -203,6 +222,22 @@ angular.module('dig', ['ngAnimate', 'underscore'])
 				});
 
 			counter++;
+
+			if (counter % 300 === 0) { // Approximately every five seconds....
+				gamestate.save({
+					depth: $scope.depth,
+					funds: $scope.funds,
+					shop: _.mapValues($scope.shop, function (val) {
+						return _.pick(val, 'owned');
+					}),
+					upgrades: _($scope.upgrades).filter(function (val) {
+						return val.available;
+					}).mapValues(function (val) {
+						return _.pick(val, 'enabled');
+					}).valueOf()
+				});
+			}
+
 			animate(gameloop);
 		});
 	}])
