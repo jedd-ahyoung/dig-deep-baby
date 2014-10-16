@@ -191,6 +191,17 @@ body {
   font-family: "Ceviche One", cursive;
   font-size: 24px;
 }
+/* Items */
+.gopher {
+  width: 40px;
+  height: 40px;
+  margin: 0 -10px;
+}
+.digger {
+  width: 60px;
+  height: 60px;
+  margin: 0 -20px;
+}
 /* Utility */
 .hidden {
   position: absolute;

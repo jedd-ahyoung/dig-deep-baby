@@ -24,20 +24,20 @@
 				</span><span class="tabhead" data-ng-class="{active: tab_achievements}" data-ng-click="tab_shop = false; tab_upgrades = false; tab_achievements = true;">Achievements</span>
 			</div>
 			<div data-ng-show="tab_shop" class="tab">
-				<div class="shopitem" data-ng-class="{enabled: currentCost(key) < funds}" data-ng-repeat="(key, item) in shop" data-ng-click="purchaseShopItem(key)">
+				<div class="shopitem" data-ng-class="{enabled: currentCost(key) <= funds}" data-ng-repeat="(key, item) in shop track by key" data-ng-click="purchaseShopItem(key)">
 					<span class="hidden">{{item.owned}}</span>
 					<span data-amt="{{item.owned}}"><strong>{{item.name}}</strong> <em>${{currentCost(key) | number:0}}</em></span>
 					<br /> {{item.desc}}
 				</div>
 			</div>
 			<div data-ng-show="tab_upgrades" class="tab">
-				<div class="shopitem" data-ng-class="{enabled: item.cost < funds}" data-ng-repeat="(key, item) in upgrades" data-ng-show="item.available && !(item.enabled)" data-ng-click="purchaseUpgradeItem(key)">
+				<div class="shopitem" data-ng-class="{enabled: item.cost <= funds}" data-ng-repeat="(key, item) in upgrades track by key" data-ng-show="item.available && !(item.enabled)" data-ng-click="purchaseUpgradeItem(key)">
 					<span><strong>{{item.name}}</strong> <em>${{item.cost | number:0}}</em></span>
 					<br /> {{item.desc}}
 				</div>
 			</div>
 			<div data-ng-show="tab_achievements" class="tab">
-				<div class="shopitem enabled" data-ng-repeat="achievement in achievements | filter: {nailed:true}">
+				<div class="shopitem enabled" data-ng-repeat="achievement in achievements | filter: {nailed:true} track by $index">
 					<span class="title">{{achievement.name}}</span><br />
 					<span>{{achievement.desc}}</span>
 				</div>
@@ -45,7 +45,7 @@
 		</div>
 	</div>
 	<div class="achievement">
-		<div class="alert" data-ng-repeat="achievement in achievements | filter: {nailed:true}">
+		<div class="alert" data-ng-repeat="achievement in achievements | filter: {nailed:true} track by $index">
 			<span class="title">{{achievement.name}}</span><br />
 			<span>{{achievement.desc}}</span>
 		</div>

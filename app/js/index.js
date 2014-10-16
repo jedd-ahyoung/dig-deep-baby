@@ -53,9 +53,9 @@ angular.module('dig', ['ngAnimate', 'underscore', 'LocalStorageModule'])
 				'<div class="wrapper"></div>',
 				'<div class="horizon" style="background-position: 0px -{{bgPos(depth)}}px;">',
 					'<div class="inner" data-depth="{{depth | number:0}}" style="height: {{holeHeight(depth) || \'100%\'}}; width: {{holeWidth()}}px; background-position: 0px -{{bgPos(depth)}}px;">',
-						'<div data-ng-repeat="item in displayArray | orderBy:\'$index\':true" class="miniondiv" style="width: {{holeWidth()}}px;">',
+						'<div data-ng-repeat="item in displayArray | orderBy:\'$index\':true track by $index" class="miniondiv" style="width: {{holeWidth()}}px;">',
 							'<span data-ng-repeat="count in ngArray(item.owned) track by $index">',
-								'<img data-ng-src="dist/img/{{item.name}}.png" />',
+								'<img class="{{item.name | lowercase}}" data-ng-src="dist/img/{{item.name | lowercase}}.svg" />',
 							'</span>',
 						'</div>',
 					'</div>',
@@ -85,7 +85,6 @@ angular.module('dig', ['ngAnimate', 'underscore', 'LocalStorageModule'])
 				scope.$watch('shop', function () {
 					// This is fucking stupid, need to put ID properties on the shop stuff and make them arrays.
 					scope.displayArray = _.values(scope.shop).reverse();
-					console.log(scope.displayArray);
 				});
 
 				(function tick(timestamp) {
@@ -132,8 +131,11 @@ angular.module('dig', ['ngAnimate', 'underscore', 'LocalStorageModule'])
 
 				var saveData = gamestate.load();
 				if (saveData) {
-					$scope.depth = saveData.depth;
-					$scope.funds = saveData.funds;
+					console.log("saveData:depth", saveData.depth, parseFloat(saveData.depth));
+					console.log("saveData:funds", saveData.funds, parseFloat(saveData.funds));
+
+					$scope.depth = parseFloat(saveData.depth);
+					$scope.funds = parseFloat(saveData.funds);
 					$scope.shop = _.merge($scope.shop, saveData.shop);
 					$scope.upgrades = _.merge($scope.upgrades, saveData.upgrades);
 				}
@@ -190,10 +192,14 @@ angular.module('dig', ['ngAnimate', 'underscore', 'LocalStorageModule'])
 		};
 
 		var counter = 0;
-		var oldtime = Date.now();
+		var oldtime = null;
 
 		// Main game logic here.
 		animate(function gameloop(timestamp) {
+			if (!oldtime) {
+				oldtime = timestamp;
+			}
+
 			var elapsed = timestamp - oldtime;
 			oldtime = timestamp;
 
@@ -225,8 +231,8 @@ angular.module('dig', ['ngAnimate', 'underscore', 'LocalStorageModule'])
 
 			if (counter % 300 === 0) { // Approximately every five seconds....
 				gamestate.save({
-					depth: $scope.depth,
-					funds: $scope.funds,
+					depth: Math.round($scope.depth * 100) / 100,
+					funds: Math.round($scope.funds * 100) / 100,
 					shop: _.mapValues($scope.shop, function (val) {
 						return _.pick(val, 'owned');
 					}),
