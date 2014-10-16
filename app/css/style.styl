@@ -23,16 +23,28 @@ body {
 	width: 100%;
 }
 
+.bank {
+	color: green;
+	font-size: 2em;
+	text-shadow:
+		-1px -1px 0 #fff,  
+		1px -1px 0 #fff,
+		-1px 1px 0 #fff,
+		1px 1px 0 #fff;
+}
+
 .shopinterface {
 	padding: 0px;
 	width: 600px;
 	margin: 0 auto;
 	position: relative;
+	user-select: none;
 
 	.tablist {
 		margin: 0;
 		padding: 0px;
 		white-space: nowrap;
+		user-select: none;
 
 		.tabhead {
 			display: inline-block;
@@ -44,6 +56,8 @@ body {
 			background: white;
 			background: rgba(255,255,255,.4);
 			text-transform: uppercase;
+			text-align: center;
+			user-select: none;
 		}
 
 		.active {
@@ -58,6 +72,7 @@ body {
 		background: white;
 		background: rgba(255,255,255,.4);
 		border: 3px solid white;
+		user-select: none;
 	}
 }
 
@@ -177,7 +192,21 @@ body {
 }
 
 .digbutton {
-	float: right;
+	position: absolute;
+	left: 50%;
+	width: 250px;
+	height: 250px;
+	margin-left: -125px;
+	bottom: 0px;
+	transition: all 50ms ease-in-out;
+
+	&:hover, &:focus {
+		transform: scale(1.1, 1.1);
+	}
+
+	&:active {
+		transform: rotate(-20deg);
+	}
 }
 
 .achievement {

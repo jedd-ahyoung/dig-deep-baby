@@ -21,3 +21,6 @@ http://www.grsites.com/archive/textures/view/source=archive/id=1559/
 http://www.grsites.com/archive/textures/view/source=archive/id=1562/
 
 http://www.grsites.com/archive/textures/view/source=archive/id=2002/
+
+Shovel:
+http://pixabay.com/en/sand-shovel-tool-158804/

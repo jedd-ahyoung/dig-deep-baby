@@ -15,11 +15,11 @@
 <body data-ng-controller="game">
 	<div data-display=""></div>
 	<div data-ng-controller="tabs" class="overlay">
-		<button class="digbutton" data-ng-click="dig()"><h1>Dig</h1></button>
+		<img src="dist/img/shovel.svg" class="digbutton" data-ng-click="dig()" alt="Dig" />
 		<div class="shopinterface">
-			<h2>{{funds | currency}}</h2>
+			<h2 class="bank">{{funds | currency}}</h2>
 			<div class="tablist">
-				<span class="tabhead" data-ng-class="{active: tab_shop}" data-ng-click="tab_shop = true; tab_upgrades = false; tab_achievements = false;">Shop
+				<span class="tabhead" data-ng-class="{active: tab_shop}" data-ng-click="tab_shop = true; tab_upgrades = false; tab_achievements = false;">Minions
 				</span><span class="tabhead" data-ng-class="{active: tab_upgrades}" data-ng-click="tab_shop = false; tab_upgrades = true; tab_achievements = false;">Upgrades
 				</span><span class="tabhead" data-ng-class="{active: tab_achievements}" data-ng-click="tab_shop = false; tab_upgrades = false; tab_achievements = true;">Achievements</span>
 			</div>

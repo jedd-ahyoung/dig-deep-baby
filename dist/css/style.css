@@ -19,13 +19,48 @@ body {
   height: 100%;
   width: 100%;
 }
+.bank {
+  color: #008000;
+  font-size: 2em;
+  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+}
 .shopinterface {
+  padding: 0px;
+  width: 600px;
+  margin: 0 auto;
+  position: relative;
+  user-select: none;
+}
+.shopinterface .tablist {
+  margin: 0;
+  padding: 0px;
+  white-space: nowrap;
+  user-select: none;
+}
+.shopinterface .tablist .tabhead {
+  display: inline-block;
+  width: 200px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  font-size: 1em;
+  padding: 0.5em;
   background: #fff;
   background: rgba(255,255,255,0.4);
-  padding: 0px;
-  width: 500px;
-  margin: 0 auto;
-  padding: 10px;
+  text-transform: uppercase;
+  text-align: center;
+  user-select: none;
+}
+.shopinterface .tablist .active {
+  background: #fff;
+}
+.shopinterface .tab {
+  max-height: 400px;
+  overflow: auto;
+  width: 100%;
+  background: #fff;
+  background: rgba(255,255,255,0.4);
+  border: 3px solid #fff;
+  user-select: none;
 }
 .shopitem {
   padding: 5px;
@@ -84,14 +119,18 @@ body {
   color: #fff;
   text-align: center;
 }
+[data-amt] {
+  overflow: visible;
+}
 [data-amt]:after {
   position: absolute;
   bottom: -12px;
-  right: 5px;
+  right: 0px;
   content: attr(data-amt);
   font-family: "Ceviche One", cursive;
   font-size: 80px;
   color: #fff;
+  text-align: right;
 }
 [data-depth]:after {
   position: fixed;
@@ -107,7 +146,20 @@ body {
   color: #fff;
 }
 .digbutton {
-  float: right;
+  position: absolute;
+  left: 50%;
+  width: 250px;
+  height: 250px;
+  margin-left: -125px;
+  bottom: 0px;
+  transition: all 50ms ease-in-out;
+}
+.digbutton:hover,
+.digbutton:focus {
+  transform: scale(1.1, 1.1);
+}
+.digbutton:active {
+  transform: rotate(-20deg);
 }
 .achievement {
   position: fixed;

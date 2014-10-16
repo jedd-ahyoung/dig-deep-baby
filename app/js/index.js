@@ -246,6 +246,4 @@ angular.module('dig', ['ngAnimate', 'underscore', 'LocalStorageModule'])
 		$scope.tab_shop = true;
 		$scope.tab_upgrades = false;
 		$scope.tab_achievements = false;
-
-		
 	}]);
