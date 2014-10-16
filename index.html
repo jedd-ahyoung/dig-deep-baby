@@ -2,10 +2,11 @@
 <head>
 	<title>Dig</title>
 
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.2.1/lodash.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
 	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>	
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.5/angular.min.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.5/angular-animate.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.5/angular-animate.min.js"></script>
+	<script type="text/javascript" src="dist/lib/angular-local-storage.min.js"></script>
 	<script type="text/javascript" src="dist/js/bundle.min.js"></script>
 
 	<link href='http://fonts.googleapis.com/css?family=Ceviche+One' rel='stylesheet' type='text/css' />
@@ -13,19 +14,33 @@
 </head>
 <body data-ng-controller="game">
 	<div data-display=""></div>
-	<div class="overlay">
+	<div data-ng-controller="tabs" class="overlay">
 		<button class="digbutton" data-ng-click="dig()"><h1>Dig</h1></button>
 		<div class="shopinterface">
-			<h2>Shop - ${{funds | number:0}}</h2>
-			<div class="shopitem" data-ng-class="{enabled: currentCost(key) < funds}" data-ng-repeat="(key, item) in shop" data-ng-click="purchaseShopItem(key)">
-				<span class="hidden">{{item.owned}}</span>
-				<span data-amt="{{item.owned}}"><strong>{{item.name}}</strong> <em>${{currentCost(key) | number:0}}</em></span>
-				<br /> {{item.desc}}
+			<h2>{{funds | currency}}</h2>
+			<div class="tablist">
+				<span class="tabhead" data-ng-class="{active: tab_shop}" data-ng-click="tab_shop = true; tab_upgrades = false; tab_achievements = false;">Shop
+				</span><span class="tabhead" data-ng-class="{active: tab_upgrades}" data-ng-click="tab_shop = false; tab_upgrades = true; tab_achievements = false;">Upgrades
+				</span><span class="tabhead" data-ng-class="{active: tab_achievements}" data-ng-click="tab_shop = false; tab_upgrades = false; tab_achievements = true;">Achievements</span>
 			</div>
-			<h2>Upgrades</h2>
-			<div class="shopitem" data-ng-repeat="(key, item) in upgrades" data-ng-show="item.available && !(item.enabled)" data-ng-click="purchaseUpgradeItem(key)">
-				<span><strong>{{item.name}}</strong> <em>${{item.cost | number:0}}</em></span>
-				<br /> {{item.desc}}
+			<div data-ng-show="tab_shop" class="tab">
+				<div class="shopitem" data-ng-class="{enabled: currentCost(key) < funds}" data-ng-repeat="(key, item) in shop" data-ng-click="purchaseShopItem(key)">
+					<span class="hidden">{{item.owned}}</span>
+					<span data-amt="{{item.owned}}"><strong>{{item.name}}</strong> <em>${{currentCost(key) | number:0}}</em></span>
+					<br /> {{item.desc}}
+				</div>
+			</div>
+			<div data-ng-show="tab_upgrades" class="tab">
+				<div class="shopitem" data-ng-class="{enabled: item.cost < funds}" data-ng-repeat="(key, item) in upgrades" data-ng-show="item.available && !(item.enabled)" data-ng-click="purchaseUpgradeItem(key)">
+					<span><strong>{{item.name}}</strong> <em>${{item.cost | number:0}}</em></span>
+					<br /> {{item.desc}}
+				</div>
+			</div>
+			<div data-ng-show="tab_achievements" class="tab">
+				<div class="shopitem enabled" data-ng-repeat="achievement in achievements | filter: {nailed:true}">
+					<span class="title">{{achievement.name}}</span><br />
+					<span>{{achievement.desc}}</span>
+				</div>
 			</div>
 		</div>
 	</div>

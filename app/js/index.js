@@ -205,4 +205,12 @@ angular.module('dig', ['ngAnimate', 'underscore'])
 			counter++;
 			animate(gameloop);
 		});
+	}])
+
+	.controller('tabs', ['$scope', function ($scope) {
+		$scope.tab_shop = true;
+		$scope.tab_upgrades = false;
+		$scope.tab_achievements = false;
+
+		
 	}]);

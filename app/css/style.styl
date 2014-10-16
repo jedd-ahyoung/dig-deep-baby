@@ -24,12 +24,41 @@ body {
 }
 
 .shopinterface {
-	background: white;
-	background: rgba(255,255,255,.4);
 	padding: 0px;
-	width: 500px;
+	width: 600px;
 	margin: 0 auto;
-	padding: 10px;
+	position: relative;
+
+	.tablist {
+		margin: 0;
+		padding: 0px;
+		white-space: nowrap;
+
+		.tabhead {
+			display: inline-block;
+			width: 200px;
+			border-top-left-radius: 10px;
+			border-top-right-radius: 10px;
+			font-size: 1em;
+			padding: .5em;
+			background: white;
+			background: rgba(255,255,255,.4);
+			text-transform: uppercase;
+		}
+
+		.active {
+			background: white;
+		}
+	}
+
+	.tab {
+		max-height: 400px;
+		overflow: auto;
+		width: 100%;
+		background: white;
+		background: rgba(255,255,255,.4);
+		border: 3px solid white;
+	}
 }
 
 .shopitem {
@@ -37,7 +66,6 @@ body {
 	position: relative;
 	color: rgba(0,0,0,0.3);
 	transition: all 500ms ease-in-out;
-
 
 	.itemcount {
 		color: white;
@@ -53,7 +81,6 @@ body {
 
 .enabled {
 	color: black;
-
 
 	&:hover {
 		background: white;
@@ -116,14 +143,19 @@ body {
 	}
 }
 
-[data-amt]:after {
-	position: absolute;
-	bottom: -12px;
-	right: 5px;
-	content: attr(data-amt);
-	font-family: "Ceviche One", cursive;
-	font-size: 80px;
-	color: white;
+[data-amt] {
+	overflow: visible;
+
+	&:after {
+		position: absolute;
+		bottom: -12px;
+		right: 0px;
+		content: attr(data-amt);
+		font-family: "Ceviche One", cursive;
+		font-size: 80px;
+		color: white;
+		text-align: right;
+	}
 }
 
 [data-depth]:after {
